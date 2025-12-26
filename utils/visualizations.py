@@ -59,14 +59,24 @@ def create_evolution_chart(runs_df: pd.DataFrame, metric: str, title: str) -> go
     # Create figure
     fig = go.Figure()
     
+    # Prepare custom data for tooltip
+    if 'pace' in metric or 'ritmo' in title.lower():
+        # It's a pace metric, format it
+        custom_data = df[metric].apply(format_pace)
+        hovertemplate = '<b>%{x|%Y-%m-%d}</b><br>' + title + ': %{customdata}<extra></extra>'
+    else:
+        custom_data = df[metric]
+        hovertemplate = '<b>%{x|%Y-%m-%d}</b><br>' + title + ': %{y:.2f}<extra></extra>'
+    
     fig.add_trace(go.Scatter(
         x=df['start_time'],
         y=df[metric],
         mode='lines+markers',
         name=title,
+        customdata=custom_data,
         line=dict(color=COLORS['cyan'], width=3),
         marker=dict(size=8, color=COLORS['lime'], line=dict(width=2, color=COLORS['cyan'])),
-        hovertemplate='<b>%{x|%Y-%m-%d}</b><br>' + title + ': %{y:.2f}<extra></extra>'
+        hovertemplate=hovertemplate
     ))
     
     fig.update_layout(
@@ -140,12 +150,17 @@ def create_session_analysis_chart(trackpoints_df: pd.DataFrame) -> go.Figure:
     
     # Add pace trace
     if 'instant_pace' in df.columns:
+        # Format pace for tooltip
+        formatted_pace = df['instant_pace'].apply(format_pace)
+        
         fig.add_trace(
             go.Scatter(
                 x=df['timestamp'],
                 y=df['instant_pace'],
                 name='Ritmo (min/km)',
-                line=dict(color=COLORS['cyan'], width=2, dash='dot')
+                customdata=formatted_pace,
+                line=dict(color=COLORS['cyan'], width=2, dash='dot'),
+                hovertemplate='<b>Ritmo:</b> %{customdata} min/km<extra></extra>'
             ),
             secondary_y=True
         )
@@ -208,6 +223,7 @@ def create_cadence_pace_scatter(runs_df: pd.DataFrame) -> go.Figure:
         x=df['avg_cadence'],
         y=df['pace_min_per_km'],
         mode='markers',
+        customdata=df['pace_min_per_km'].apply(format_pace),
         marker=dict(
             size=df['distance_km'] * 2,  # Size based on distance
             color=df['distance_km'],
@@ -218,7 +234,7 @@ def create_cadence_pace_scatter(runs_df: pd.DataFrame) -> go.Figure:
         ),
         text=df['distance_km'].round(2).astype(str) + ' km',
         hovertemplate='<b>Cadencia:</b> %{x:.0f} spm<br>' +
-                      '<b>Ritmo:</b> %{y:.2f} min/km<br>' +
+                      '<b>Ritmo:</b> %{customdata} min/km<br>' +
                       '<b>Distancia:</b> %{text}<extra></extra>'
     ))
     

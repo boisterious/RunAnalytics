@@ -2,33 +2,20 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-env/
-venv/
+.pytest_cache/
 .venv/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
+venv/
+env/
 
 # Streamlit
 .streamlit/secrets.toml
 
-# Data (optional - remove if you want to include sample data)
-# data/
+# Data
+data/runs_history.json
+data/runs_history_backup.json
+*.tcx
+*.json
 
-# Logs and debug
-*.log
-debug_output.txt
-
-# Temporary files
-*.tmp
-analyze_runs.py
-debug_history.py
+# IDE
+.vscode/
+.idea/
