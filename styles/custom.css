@@ -447,7 +447,9 @@ a:hover {
     transition: all 0.3s ease;
     cursor: pointer;
     width: 100%;
-    display: block;
+    display: flex !important;
+    align-items: center;
+    white-space: nowrap;
 }
 
 .stRadio label:hover {
