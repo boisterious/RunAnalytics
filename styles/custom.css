@@ -1,0 +1,364 @@
+/* Apex Run Analytics - Premium Dark Mode CSS */
+
+/* Import modern font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+/* Global Styles */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Main background - Deep dark with subtle gradient */
+.stApp {
+    background: linear-gradient(135deg, #0A0E1A 0%, #141824 100%);
+}
+
+/* Hide Streamlit branding */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Custom header */
+.main-header {
+    background: linear-gradient(90deg, rgba(0, 255, 255, 0.1) 0%, rgba(50, 205, 50, 0.1) 100%);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+}
+
+.main-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #00FFFF 0%, #32CD32 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.main-subtitle {
+    color: #B0B0B0;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    font-weight: 300;
+}
+
+/* KPI Cards */
+.kpi-card {
+    background: linear-gradient(135deg, #1A1F35 0%, #252B45 100%);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+    border-color: rgba(0, 255, 255, 0.6);
+}
+
+.kpi-icon {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+}
+
+.kpi-content {
+    flex: 1;
+}
+
+.kpi-title {
+    color: #B0B0B0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+}
+
+.kpi-value {
+    color: #00FFFF;
+    font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.kpi-subtitle {
+    color: #32CD32;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* File uploader styling */
+.stFileUploader > div {
+    background: linear-gradient(135deg, #1A1F35 0%, #252B45 100%);
+    border: 3px dashed rgba(0, 255, 255, 0.5);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.stFileUploader > div:hover {
+    border-color: rgba(50, 205, 50, 0.7);
+    background: linear-gradient(135deg, #252B45 0%, #2A3050 100%);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+/* Section headers */
+h1, h2, h3 {
+    color: #00FFFF !important;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+h2 {
+    border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+}
+
+/* Tabs styling */
+.stTabs [data-baseweb="tab-list"] {
+    background: linear-gradient(90deg, #1A1F35 0%, #252B45 100%);
+    border-radius: 10px;
+    padding: 0.5rem;
+    gap: 0.5rem;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: transparent;
+    border-radius: 8px;
+    color: #B0B0B0;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(0, 255, 255, 0.1);
+    color: #00FFFF;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(90deg, rgba(0, 255, 255, 0.2) 0%, rgba(50, 205, 50, 0.2) 100%) !important;
+    color: #00FFFF !important;
+    border: 1px solid rgba(0, 255, 255, 0.5) !important;
+}
+
+/* Selectbox styling */
+.stSelectbox > div > div {
+    background: #1A1F35;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    color: #E0E0E0;
+}
+
+.stSelectbox > div > div:hover {
+    border-color: rgba(0, 255, 255, 0.6);
+}
+
+/* Metric containers */
+.stMetric {
+    background: linear-gradient(135deg, #1A1F35 0%, #252B45 100%);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.stMetric label {
+    color: #B0B0B0 !important;
+}
+
+.stMetric [data-testid="stMetricValue"] {
+    color: #00FFFF !important;
+}
+
+/* Data tables */
+.dataframe {
+    background: #1A1F35 !important;
+    color: #E0E0E0 !important;
+    border: 2px solid rgba(0, 255, 255, 0.3) !important;
+    border-radius: 10px !important;
+}
+
+.dataframe th {
+    background: linear-gradient(90deg, rgba(0, 255, 255, 0.2) 0%, rgba(50, 205, 50, 0.2) 100%) !important;
+    color: #00FFFF !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    padding: 1rem !important;
+}
+
+.dataframe td {
+    border-color: rgba(0, 255, 255, 0.1) !important;
+    padding: 0.75rem !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0A0E1A;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00FFFF 0%, #32CD32 100%);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #32CD32 0%, #00FFFF 100%);
+}
+
+/* Info/success/warning boxes */
+.stAlert {
+    background: linear-gradient(135deg, #1A1F35 0%, #252B45 100%);
+    border-left: 4px solid #00FFFF;
+    border-radius: 10px;
+    color: #E0E0E0;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(90deg, #00FFFF 0%, #32CD32 100%);
+    color: #0A0E1A;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background: linear-gradient(90deg, #1A1F35 0%, #252B45 100%);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    color: #00FFFF !important;
+    font-weight: 600;
+}
+
+.streamlit-expanderHeader:hover {
+    border-color: rgba(0, 255, 255, 0.6);
+    background: linear-gradient(90deg, #252B45 0%, #2A3050 100%);
+}
+
+/* Loading spinner */
+.stSpinner > div {
+    border-top-color: #00FFFF !important;
+    border-right-color: #32CD32 !important;
+}
+
+/* Divider */
+hr {
+    border-color: rgba(0, 255, 255, 0.3) !important;
+    margin: 2rem 0 !important;
+}
+
+/* Text colors */
+p, span, div {
+    color: #E0E0E0;
+}
+
+/* Links */
+a {
+    color: #00FFFF;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #32CD32;
+    text-shadow: 0 0 5px rgba(50, 205, 50, 0.5);
+}
+
+/* Glow animation for premium effect */
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    }
+}
+
+.glow-effect {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* Custom Tooltip */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    margin-left: 5px;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 300px;
+    background-color: #1A1F35;
+    color: #E0E0E0;
+    text-align: left;
+    border-radius: 8px;
+    padding: 1rem;
+    position: absolute;
+    z-index: 999;
+    bottom: 125%; /* Position above */
+    left: 50%;
+    margin-left: -150px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border: 1px solid #00FFFF;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-content h4 {
+    color: #00FFFF !important;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    padding-bottom: 0.3rem;
+}
+
+.tooltip-content p {
+    margin-bottom: 0.5rem;
+    color: #B0B0B0;
+}
+
+.tooltip-content ul {
+    padding-left: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.tooltip-content li {
+    margin-bottom: 0.2rem;
+    color: #E0E0E0;
+}
