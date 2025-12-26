@@ -419,3 +419,43 @@ a:hover {
         padding: 0.5rem;
     }
 }
+
+/* Sidebar Styling */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0A0E1A 0%, #141824 100%);
+    border-right: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+[data-testid="stSidebar"] h1 {
+    font-size: 2rem !important;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Sidebar Radio Buttons as Menu */
+.stRadio>div {
+    background: transparent;
+}
+
+.stRadio label {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    display: block;
+}
+
+.stRadio label:hover {
+    border-color: #00FFFF;
+    background: rgba(0, 255, 255, 0.05);
+}
+
+/* Selected radio option */
+.stRadio [data-baseweb="radio"] [class*="checked"]+div {
+    color: #00FFFF !important;
+    font-weight: bold;
+}
