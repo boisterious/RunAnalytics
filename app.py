@@ -497,6 +497,9 @@ def render_data_manager():
                 if 'metrics' in imported_data[0] and 'start_time' in imported_data[0]:
                     for run in imported_data:
                         if 'data' not in run: run['data'] = pd.DataFrame()
+                        # Ensure start_time is datetime
+                        if isinstance(run.get('start_time'), str):
+                            run['start_time'] = pd.to_datetime(run['start_time'])
                     
                     c1, c2 = st.columns(2)
                     if c1.button("➕ Añadir JSON", use_container_width=True):
