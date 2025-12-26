@@ -189,6 +189,82 @@ if history_stats['total_runs'] > 0:
             latest = history_stats['date_range']['latest'].strftime('%d/%m/%Y')
             st.metric("🏃 Última Sesión", latest)
     
+    # Export/Import section
+    st.markdown("---")
+    st.markdown("### 💾 Gestión de Datos")
+    
+    col_export, col_import = st.columns(2)
+    
+    with col_export:
+        # Download history as JSON
+        if st.session_state.runs:
+            import json
+            # Prepare data for export (exclude heavy data_dict to reduce size)
+            export_data = []
+            for run in st.session_state.runs:
+                run_export = {k: v for k, v in run.items() if k != 'data'}
+                # Also exclude data_dict if present (very large)
+                if 'data_dict' in run_export:
+                    del run_export['data_dict']
+                export_data.append(run_export)
+            
+            json_str = json.dumps(export_data, indent=2, default=str)
+            
+            st.download_button(
+                label="📥 Descargar Historial",
+                data=json_str,
+                file_name=f"mi_historial_running_{datetime.now().strftime('%Y%m%d')}.json",
+                mime="application/json",
+                help="Descarga tu historial como JSON. Guarda este archivo para restaurar tus datos más tarde.",
+                use_container_width=True
+            )
+        else:
+            st.info("No hay historial para descargar")
+    
+    with col_import:
+        # Upload history JSON
+        uploaded_json = st.file_uploader(
+            "📤 Cargar Historial",
+            type=['json'],
+            help="Sube un archivo JSON de historial previamente descargado",
+            key="json_uploader"
+        )
+        
+        if uploaded_json:
+            try:
+                import json
+                imported_data = json.load(uploaded_json)
+                
+                if isinstance(imported_data, list) and len(imported_data) > 0:
+                    # Validate structure
+                    if 'metrics' in imported_data[0] and 'start_time' in imported_data[0]:
+                        # Convert to proper format and add empty data DataFrame
+                        for run in imported_data:
+                            if 'data' not in run:
+                                run['data'] = pd.DataFrame()
+                        
+                        col_add, col_replace = st.columns(2)
+                        with col_add:
+                            if st.button("➕ Añadir", key="add_json", use_container_width=True):
+                                st.session_state.runs = merge_runs(st.session_state.runs, imported_data)
+                                save_runs_history(st.session_state.runs)
+                                st.success(f"✅ Añadidos {len(imported_data)} entrenamientos")
+                                st.rerun()
+                        with col_replace:
+                            if st.button("🔄 Reemplazar", key="replace_json", use_container_width=True):
+                                st.session_state.runs = imported_data
+                                save_runs_history(st.session_state.runs)
+                                st.success(f"✅ Cargados {len(imported_data)} entrenamientos")
+                                st.rerun()
+                    else:
+                        st.error("❌ Formato de JSON no válido")
+                else:
+                    st.error("❌ El archivo no contiene datos válidos")
+            except Exception as e:
+                st.error(f"❌ Error al leer JSON: {str(e)}")
+    
+    st.markdown("---")
+    
     # Clear history button
     if st.button("🗑️ Limpiar Historial", help="Eliminar todos los datos guardados"):
         if clear_history():
@@ -199,6 +275,7 @@ if history_stats['total_runs'] > 0:
             st.success("✅ Historial limpiado exitosamente")
             st.rerun()
 
+st.markdown("### 📁 Cargar Nuevos Entrenamientos")
 uploaded_files = st.file_uploader(
     "Arrastra y suelta tus archivos .tcx aquí",
     type=['tcx'],
