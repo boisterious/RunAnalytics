@@ -22,9 +22,10 @@ footer {
     visibility: hidden;
 }
 
-header {
+/* Header visibility restored for sidebar navigation */
+/* header {
     visibility: hidden;
-}
+} */
 
 /* Custom header */
 .main-header {

@@ -485,6 +485,33 @@ def render_data_manager():
         import json
         export_data = [{k: v for k, v in r.items() if k != 'data' and k != 'data_dict'} for r in st.session_state.runs]
         st.download_button("📥 Descargar Backup JSON", json.dumps(export_data, default=str), "backup.json", "application/json")
+    
+    st.markdown("### Importar Backup")
+    uploaded_json = st.file_uploader("Cargar JSON de historial", type=['json'], key="json_uploader")
+    if uploaded_json:
+        try:
+            import json
+            imported_data = json.load(uploaded_json)
+            if isinstance(imported_data, list) and len(imported_data) > 0:
+                # Validate structure
+                if 'metrics' in imported_data[0] and 'start_time' in imported_data[0]:
+                    for run in imported_data:
+                        if 'data' not in run: run['data'] = pd.DataFrame()
+                    
+                    c1, c2 = st.columns(2)
+                    if c1.button("➕ Añadir JSON", use_container_width=True):
+                        st.session_state.runs = merge_runs(st.session_state.runs, imported_data)
+                        save_runs_history(st.session_state.runs)
+                        st.success(f"✅ Añadidos {len(imported_data)} entrenamientos")
+                        st.rerun()
+                    if c2.button("🔄 Reemplazar con JSON", use_container_width=True):
+                        st.session_state.runs = imported_data
+                        save_runs_history(st.session_state.runs)
+                        st.success(f"✅ Cargados {len(imported_data)} entrenamientos")
+                        st.rerun()
+                else: st.error("❌ Formato JSON inválido")
+            else: st.error("❌ Archivo vacío o inválido")
+        except Exception as e: st.error(f"Error: {e}")
 
 
 def process_files(files, mode='add'):
