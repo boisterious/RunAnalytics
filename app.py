@@ -383,6 +383,23 @@ def render_analysis():
                 route_coords = df[['lat', 'lon']].dropna().values.tolist()
                 folium.PolyLine(route_coords, color='#00FFFF', weight=4, opacity=0.8).add_to(m)
                 folium_static(m, width=800, height=400)
+            
+            st.markdown("---")
+            st.markdown("#### 🧠 Análisis de Sesión (IA)")
+            
+            api_key = st.secrets.get("groq", {}).get("api_key")
+            if not api_key:
+                st.warning("⚠️ Configura tu API Key de Groq para usar esta función")
+            else:
+                if st.button("🚀 Analizar esta sesión con IA", key=f"btn_analyze_{selected_run['filename']}"):
+                    with st.spinner("Analizando sesión..."):
+                        from utils.ai_analyzer import AIRunningAnalyzer
+                        analyzer = AIRunningAnalyzer(api_key)
+                        analysis = analyzer.analyze_session(selected_run, metrics)
+                        st.session_state[f'ai_session_{selected_run["filename"]}'] = analysis
+                
+                if f'ai_session_{selected_run["filename"]}' in st.session_state:
+                    st.markdown(st.session_state[f'ai_session_{selected_run["filename"]}'])
 
 
 def render_coach():
@@ -407,6 +424,9 @@ def render_coach():
         </div>
         """, unsafe_allow_html=True)
 
+    # API Key check
+    api_key = st.secrets.get("groq", {}).get("api_key")
+    
     with t_week:
         stats = summary_stats.get('weekly', {})
         if stats:
@@ -415,39 +435,46 @@ def render_coach():
             c2.metric("Sesiones", stats.get('total_runs', 0))
             c3.metric("Carga", int(stats.get('total_load', 0)))
         for insight in all_insights.get('short_term', []): display_insight_card(insight)
+        
+        if api_key:
+            st.markdown("---")
+            if st.button("🧠 Analizar Semana con IA", key="btn_ai_week"):
+                with st.spinner("Consultando al coach..."):
+                    from utils.ai_analyzer import AIRunningAnalyzer
+                    analyzer = AIRunningAnalyzer(api_key)
+                    st.session_state['ai_week_analysis'] = analyzer.analyze_weekly(stats, st.session_state.runs)
+            
+            if 'ai_week_analysis' in st.session_state:
+                st.info(st.session_state['ai_week_analysis'])
 
     with t_month:
         for insight in all_insights.get('medium_term', []): display_insight_card(insight)
+        
+        if api_key:
+            st.markdown("---")
+            if st.button("🧠 Analizar Mes con IA", key="btn_ai_month"):
+                with st.spinner("Analizando tendencias..."):
+                    from utils.ai_analyzer import AIRunningAnalyzer
+                    analyzer = AIRunningAnalyzer(api_key)
+                    progression = summary_stats.get('monthly_progression', {})
+                    st.session_state['ai_month_analysis'] = analyzer.analyze_monthly(summary_stats.get('monthly', {}), progression)
+            
+            if 'ai_month_analysis' in st.session_state:
+                st.info(st.session_state['ai_month_analysis'])
 
     with t_long:
         for insight in all_insights.get('long_term', []): display_insight_card(insight)
-
-    st.markdown("---")
-    st.markdown("### 🧠 Informe IA Personalizado")
-    
-    # AI Generation Logic
-    api_key = st.secrets.get("groq", {}).get("api_key")
-    if not api_key:
-        st.warning("⚠️ Configura tu API Key de Groq en `.streamlit/secrets.toml`")
-    else:
-        with st.expander("⚙️ Configurar Análisis", expanded=True):
-            c1, c2 = st.columns(2)
-            days = c1.slider("Días disponibles/semana", 2, 6, 4)
-            goal = c2.selectbox("Objetivo", ["Mejorar ritmo", "Aumentar distancia", "Preparar carrera", "Salud"])
+        
+        if api_key:
+            st.markdown("---")
+            if st.button("🧠 Analizar Trayectoria (IA)", key="btn_ai_long"):
+                with st.spinner("Analizando historial..."):
+                    from utils.ai_analyzer import AIRunningAnalyzer
+                    analyzer = AIRunningAnalyzer(api_key)
+                    st.session_state['ai_long_analysis'] = analyzer.analyze_long_term(summary_stats.get('annual', {}))
             
-            if st.button("🚀 Generar Nuevo Informe", type="primary", use_container_width=True):
-                with st.spinner("Analizando datos..."):
-                    try:
-                        from utils.ai_analyzer import AIRunningAnalyzer
-                        analyzer = AIRunningAnalyzer(api_key)
-                        context = analyzer.prepare_context(st.session_state.runs, st.session_state.runs_df, {'running_days': days, 'main_goal': goal})
-                        analysis = analyzer.generate_analysis(context)
-                        st.session_state['ai_analysis'] = analysis
-                    except Exception as e:
-                        st.error(f"Error: {e}")
-
-        if 'ai_analysis' in st.session_state:
-            st.markdown(st.session_state['ai_analysis'])
+            if 'ai_long_analysis' in st.session_state:
+                st.info(st.session_state['ai_long_analysis'])
 
 
 def render_data_manager():

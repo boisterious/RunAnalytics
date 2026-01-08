@@ -204,8 +204,9 @@ IMPORTANTE:
 - Máximo 600 palabras total
 """
         
+    def _call_api(self, prompt: str) -> str:
+        """Helper to call Groq API"""
         try:
-            # Prepare request for Groq API (OpenAI compatible format)
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {self.api_key}"
@@ -226,15 +227,12 @@ IMPORTANTE:
                 "max_tokens": 2048
             }
             
-            # Make request (increased timeout for longer responses)
             response = requests.post(self.API_URL, headers=headers, json=payload, timeout=60)
             
             if response.status_code == 200:
                 data = response.json()
-                # Extract text from Groq/OpenAI response format
                 try:
-                    text = data['choices'][0]['message']['content']
-                    return text
+                    return data['choices'][0]['message']['content']
                 except (KeyError, IndexError) as e:
                     return f"❌ **Error al procesar respuesta**: Estructura inesperada. {str(e)}"
             else:
@@ -247,9 +245,161 @@ IMPORTANTE:
             return f"❌ **Error de conexión**: {str(e)}"
         except Exception as e:
             return f"❌ **Error inesperado**: {str(e)}"
+
+    def generate_analysis(self, context: str) -> str:
+        """Generate general AI analysis (Legacy/Full Profile)"""
+        if not self.initialized: return "❌ **Error**: No se proporcionó API key."
+        
+        prompt = f"""Eres un entrenador profesional de running con 20 años de experiencia. Analiza estos datos de un corredor:
+
+{context}
+
+INSTRUCCIONES:
+1. Esta app SOLO analiza entrenamientos de running.
+2. Ten en cuenta las otras actividades que hace el usuario.
+3. El corredor YA está en un nivel de volumen determinado. Tu plan debe PARTIR de ese nivel.
+
+Genera un informe con EXACTAMENTE estas 5 secciones en markdown:
+
+## 🎯 Valoración General
+(2-3 líneas sobre su nivel actual y progreso)
+
+## 💪 Fortalezas Detectadas
+(3-4 puntos específicos)
+
+## 📈 Áreas de Mejora
+(3-4 aspectos concretos a trabajar)
+
+## 🏃 Plan de Entrenamiento Semanal (Próximas 4 Semanas)
+Propón un plan que parta del volumen actual e introduzca variedad.
+Formato:
+**Semana X:**
+- Lunes: ...
+...
+- **Total running semanal: XX km**
+
+## 🎖️ Objetivo de Carrera
+(Una carrera/distancia específica para los próximos 3-6 meses)
+
+IMPORTANTE:
+- Usa ritmos en formato mm:ss
+- Distancias EXACTAS en km
+- Tono motivador pero realista
+- Máximo 600 palabras
+"""
+        return self._call_api(prompt)
+
+    def analyze_weekly(self, weekly_stats: Dict, recent_runs: List[Dict]) -> str:
+        """Generate specific weekly analysis"""
+        if not self.initialized: return "❌ **Error**: No se proporcionó API key."
+        
+        # Build context from stats
+        context = f"""
+RESUMEN SEMANAL:
+- Distancia total: {weekly_stats.get('total_km', 0):.1f} km
+- Tiempo total: {weekly_stats.get('total_time_hours', 0):.1f} horas
+- Número de sesiones: {weekly_stats.get('total_runs', 0)}
+- Carga TRIMP: {int(weekly_stats.get('total_load', 0))}
+- Tipos de sesión: {weekly_stats.get('session_types', {})}
+"""
+        prompt = f"""Analiza esta semana de entrenamiento de un corredor:
+{context}
+
+Como entrenador, dame un feedback CORTO y DIRECTO (máx 150 palabras) con:
+1. **Evaluación**: ¿Ha sido una semana de carga, descarga o mantenimiento? ¿El volumen es adecuado?
+2. **Consejo Inmediato**: ¿Qué debería hacer la próxima semana basándose en esto? (Ej: descansar más, mantener, apretar...)
+3. **Alerta**: Si ves algo preocupante (mucha carga de golpe, falta de variedad, etc).
+
+Usa emojis y formato markdown.
+"""
+        return self._call_api(prompt)
+
+    def analyze_monthly(self, monthly_stats: Dict, progression: Dict) -> str:
+        """Generate monthly trend analysis"""
+        if not self.initialized: return "❌ **Error**: No se proporcionó API key."
+        
+        context = f"""
+PROGRESIÓN MENSUAL:
+- Tendencia Eficiencia: {progression.get('efficiency_trend', 'stable')} ({progression.get('ei_change_pct', 0):+.1f}%)
+- Tendencia Ritmo: {progression.get('pace_trend', 'stable')} ({progression.get('pace_change_pct', 0):+.1f}%)
+- Tendencia Volumen: {progression.get('volume_trend', 'stable')}
+"""
+        prompt = f"""Analiza la progresión del último mes de este corredor:
+{context}
+
+Como entrenador, dame un análisis de TENDENCIAS (máx 200 palabras):
+1. **¿Estamos mejorando?**: Interpreta los cambios en eficiencia y ritmo.
+2. **Enfoque del Mes**: ¿En qué fase del entrenamiento parece estar? (Base, Calidad, Tapering...)
+3. **Recomendación Táctica**: ¿Qué cualidad física debería priorizar el próximo mes?
+
+Usa emojis y formato markdown.
+"""
+        return self._call_api(prompt)
+
+    def analyze_long_term(self, annual_stats: Dict) -> str:
+        """Generate long term analysis"""
+        if not self.initialized: return "❌ **Error**: No se proporcionó API key."
+        
+        context = f"""
+HISTORIAL A LARGO PLAZO:
+- Meses activos: {annual_stats.get('total_months', 0)}
+- Km totales periodo: {annual_stats.get('total_km_period', 0):.0f}
+- Tendencia Km: {annual_stats.get('km_trend', 'stable')}
+- Mes más activo: {annual_stats.get('most_active_month', 'N/A')}
+"""
+        prompt = f"""Analiza la constancia y visión a largo plazo:
+{context}
+
+Como entrenador, valora la CONSISTENCIA (máx 150 palabras):
+1. **Valoración de Constancia**: ¿Es un corredor consistente?
+2. **Visión Macro**: ¿Cómo ves su evolución de volumen a largo plazo?
+3. **Palabras de Motivación**: Mensaje para mantener la disciplina.
+
+Usa emojis y formato markdown.
+"""
+        return self._call_api(prompt)
+
+    def analyze_session(self, session_data: Dict, metrics: Dict) -> str:
+        """Analyze a specific session"""
+        if not self.initialized: return "❌ **Error**: No se proporcionó API key."
+        
+        # Extract key metrics
+        dist = metrics.get('distance_km', 0)
+        dur = metrics.get('duration_minutes', 0)
+        pace = self._format_pace(metrics.get('pace_min_per_km', 0))
+        hr = int(metrics.get('avg_heart_rate', 0)) if metrics.get('avg_heart_rate') else "N/A"
+        cad = int(metrics.get('avg_cadence', 0)) if metrics.get('avg_cadence') else "N/A"
+        ei = f"{metrics.get('efficiency_index', 0):.2f}" if metrics.get('efficiency_index') else "N/A"
+        gap = self._format_pace(metrics.get('gap_pace_min_per_km', 0)) if metrics.get('gap_pace_min_per_km') else "N/A"
+        elev = metrics.get('elevation_gain', 0)
+        
+        context = f"""
+DATOS DE LA SESIÓN:
+- Distancia: {dist:.2f} km
+- Duración: {dur:.1f} min
+- Ritmo Medio: {pace} min/km
+- GAP (Ritmo Ajustado): {gap} min/km
+- Desnivel: +{elev:.0f} m
+- FC Media: {hr} bpm
+- Cadencia Media: {cad} spm
+- Efficiency Index: {ei}
+"""
+        prompt = f"""Analiza esta sesión de entrenamiento específica:
+{context}
+
+Como entrenador, dame un feedback TÉCNICO de la sesión (máx 200 palabras):
+1. **Tipo de Sesión**: Identifica qué tipo de entreno parece ser (Rodaje, Tempo, Series, Recuperación...) basándote en los datos.
+2. **Análisis de Rendimiento**:
+   - Relación Ritmo/FC (si hay datos).
+   - Eficiencia (si hay datos).
+   - Cadencia.
+3. **Veredicto**: ¿Fue una buena sesión? ¿Se cumplió el objetivo probable?
+
+Usa emojis y formato markdown.
+"""
+        return self._call_api(prompt)
     
     @staticmethod
-    @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes
+    @st.cache_data(ttl=300, show_spinner=False)
     def cached_analysis(_self, context: str) -> str:
-        """Cached version of generate_analysis"""
         return _self.generate_analysis(context)
