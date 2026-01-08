@@ -438,11 +438,12 @@ def render_coach():
         
         if api_key:
             st.markdown("---")
+            context_week = st.text_area("📝 Contexto Adicional (Opcional)", placeholder="Ej: Estuve enfermo 2 días, vacaciones...", key="ctx_week", height=70)
             if st.button("🧠 Analizar Semana con IA", key="btn_ai_week"):
                 with st.spinner("Consultando al coach..."):
                     from utils.ai_analyzer import AIRunningAnalyzer
                     analyzer = AIRunningAnalyzer(api_key)
-                    st.session_state['ai_week_analysis'] = analyzer.analyze_weekly(stats, st.session_state.runs)
+                    st.session_state['ai_week_analysis'] = analyzer.analyze_weekly(stats, st.session_state.runs, user_context=context_week)
             
             if 'ai_week_analysis' in st.session_state:
                 st.info(st.session_state['ai_week_analysis'])
@@ -452,12 +453,13 @@ def render_coach():
         
         if api_key:
             st.markdown("---")
+            context_month = st.text_area("📝 Contexto Adicional (Opcional)", placeholder="Ej: Cambio de zapatillas, lesión leve...", key="ctx_month", height=70)
             if st.button("🧠 Analizar Mes con IA", key="btn_ai_month"):
                 with st.spinner("Analizando tendencias..."):
                     from utils.ai_analyzer import AIRunningAnalyzer
                     analyzer = AIRunningAnalyzer(api_key)
                     progression = summary_stats.get('monthly_progression', {})
-                    st.session_state['ai_month_analysis'] = analyzer.analyze_monthly(summary_stats.get('monthly', {}), progression)
+                    st.session_state['ai_month_analysis'] = analyzer.analyze_monthly(summary_stats.get('monthly', {}), progression, user_context=context_month)
             
             if 'ai_month_analysis' in st.session_state:
                 st.info(st.session_state['ai_month_analysis'])
@@ -467,11 +469,12 @@ def render_coach():
         
         if api_key:
             st.markdown("---")
+            context_long = st.text_area("📝 Contexto Adicional (Opcional)", placeholder="Ej: Objetivo maratón en 6 meses...", key="ctx_long", height=70)
             if st.button("🧠 Analizar Trayectoria (IA)", key="btn_ai_long"):
                 with st.spinner("Analizando historial..."):
                     from utils.ai_analyzer import AIRunningAnalyzer
                     analyzer = AIRunningAnalyzer(api_key)
-                    st.session_state['ai_long_analysis'] = analyzer.analyze_long_term(summary_stats.get('annual', {}))
+                    st.session_state['ai_long_analysis'] = analyzer.analyze_long_term(summary_stats.get('annual', {}), user_context=context_long)
             
             if 'ai_long_analysis' in st.session_state:
                 st.info(st.session_state['ai_long_analysis'])

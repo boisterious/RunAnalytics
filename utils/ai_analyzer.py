@@ -289,7 +289,7 @@ IMPORTANTE:
 """
         return self._call_api(prompt)
 
-    def analyze_weekly(self, weekly_stats: Dict, recent_runs: List[Dict]) -> str:
+    def analyze_weekly(self, weekly_stats: Dict, recent_runs: List[Dict], user_context: str = "") -> str:
         """Generate specific weekly analysis"""
         if not self.initialized: return "❌ **Error**: No se proporcionó API key."
         
@@ -302,6 +302,9 @@ RESUMEN SEMANAL:
 - Carga TRIMP: {int(weekly_stats.get('total_load', 0))}
 - Tipos de sesión: {weekly_stats.get('session_types', {})}
 """
+        if user_context:
+            context += f"\nCONTEXTO DEL USUARIO (IMPORTANTE): {user_context}\n"
+
         prompt = f"""Analiza esta semana de entrenamiento de un corredor:
 {context}
 
@@ -314,7 +317,7 @@ Usa emojis y formato markdown.
 """
         return self._call_api(prompt)
 
-    def analyze_monthly(self, monthly_stats: Dict, progression: Dict) -> str:
+    def analyze_monthly(self, monthly_stats: Dict, progression: Dict, user_context: str = "") -> str:
         """Generate monthly trend analysis"""
         if not self.initialized: return "❌ **Error**: No se proporcionó API key."
         
@@ -324,6 +327,9 @@ PROGRESIÓN MENSUAL:
 - Tendencia Ritmo: {progression.get('pace_trend', 'stable')} ({progression.get('pace_change_pct', 0):+.1f}%)
 - Tendencia Volumen: {progression.get('volume_trend', 'stable')}
 """
+        if user_context:
+            context += f"\nCONTEXTO DEL USUARIO (IMPORTANTE): {user_context}\n"
+
         prompt = f"""Analiza la progresión del último mes de este corredor:
 {context}
 
@@ -336,7 +342,7 @@ Usa emojis y formato markdown.
 """
         return self._call_api(prompt)
 
-    def analyze_long_term(self, annual_stats: Dict) -> str:
+    def analyze_long_term(self, annual_stats: Dict, user_context: str = "") -> str:
         """Generate long term analysis"""
         if not self.initialized: return "❌ **Error**: No se proporcionó API key."
         
@@ -347,6 +353,9 @@ HISTORIAL A LARGO PLAZO:
 - Tendencia Km: {annual_stats.get('km_trend', 'stable')}
 - Mes más activo: {annual_stats.get('most_active_month', 'N/A')}
 """
+        if user_context:
+            context += f"\nCONTEXTO DEL USUARIO (IMPORTANTE): {user_context}\n"
+
         prompt = f"""Analiza la constancia y visión a largo plazo:
 {context}
 
