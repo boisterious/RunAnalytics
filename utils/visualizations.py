@@ -334,3 +334,70 @@ def format_duration(duration_minutes: float) -> str:
         return f"{hours}:{minutes:02d}:{seconds:02d}"
     else:
         return f"{minutes}:{seconds:02d}"
+
+
+def create_volume_chart(runs_df: pd.DataFrame, period: str = 'monthly') -> go.Figure:
+    """
+    Create a bar chart showing volume (distance) per period
+    
+    Args:
+        runs_df: DataFrame with runs data
+        period: 'monthly' or 'weekly'
+        
+    Returns:
+        Plotly figure
+    """
+    df = runs_df.copy()
+    df['start_time'] = pd.to_datetime(df['start_time'])
+    
+    if period == 'monthly':
+        df['period'] = df['start_time'].dt.to_period('M').astype(str)
+        title = "Volumen Mensual (km)"
+        x_label = "Mes"
+    else:
+        df['period'] = df['start_time'].dt.to_period('W').astype(str)
+        title = "Volumen Semanal (km)"
+        x_label = "Semana"
+        
+    # Aggregate
+    volume_df = df.groupby('period')['distance_km'].sum().reset_index()
+    
+    fig = go.Figure()
+    
+    fig.add_trace(go.Bar(
+        x=volume_df['period'],
+        y=volume_df['distance_km'],
+        name='Distancia',
+        marker=dict(
+            color=volume_df['distance_km'],
+            colorscale=[[0, COLORS['cyan']], [1, COLORS['magenta']]],
+            line=dict(width=1, color=COLORS['text'])
+        ),
+        hovertemplate='<b>%{x}</b><br>Distancia: %{y:.1f} km<extra></extra>'
+    ))
+    
+    # Add trend line
+    if len(volume_df) > 1:
+        x_nums = np.arange(len(volume_df))
+        z = np.polyfit(x_nums, volume_df['distance_km'], 1)
+        p = np.poly1d(z)
+        
+        fig.add_trace(go.Scatter(
+            x=volume_df['period'],
+            y=p(x_nums),
+            mode='lines',
+            name='Tendencia',
+            line=dict(color=COLORS['yellow'], width=2, dash='dash'),
+            hoverinfo='skip'
+        ))
+    
+    fig.update_layout(
+        title=title,
+        xaxis_title=x_label,
+        yaxis_title="Kilómetros",
+        **create_plotly_theme()['layout'],
+        height=350,
+        showlegend=False
+    )
+    
+    return fig

@@ -25,7 +25,7 @@ from utils.metrics import RunningMetrics, PersonalRecords
 from utils.visualizations import (
     create_evolution_chart, create_session_analysis_chart,
     create_cadence_pace_scatter, create_kpi_card_html,
-    format_pace, format_duration, COLORS
+    format_pace, format_duration, COLORS, create_volume_chart
 )
 from utils.persistence import (
     load_runs_history, save_runs_history, merge_runs, 
@@ -410,7 +410,7 @@ def render_coach():
     all_insights = coach.generate_all_insights()
     summary_stats = coach.get_summary_stats()
     
-    t_week, t_month, t_long = st.tabs(["📅 Semanal", "📊 Mensual", "📈 Largo Plazo"])
+    t_week, t_month, t_long, t_plan = st.tabs(["📅 Semanal", "📊 Mensual", "📈 Largo Plazo", "📅 Planificación"])
     
     def display_insight_card(insight):
         colors = {'success': '#00FF7F', 'info': '#00BFFF', 'warning': '#FFA500', 'error': '#FF4444'}
@@ -475,6 +475,39 @@ def render_coach():
             
             if 'ai_long_analysis' in st.session_state:
                 st.info(st.session_state['ai_long_analysis'])
+        
+        st.markdown("#### 📊 Evolución de Volumen")
+        if not st.session_state.runs_df.empty:
+            fig_vol = create_volume_chart(st.session_state.runs_df, period='monthly')
+            st.plotly_chart(fig_vol, use_container_width=True)
+
+    with t_plan:
+        st.markdown("### 📅 Generador de Planes de Entrenamiento")
+        st.markdown("Crea un plan personalizado de 4 semanas basado en tu historial reciente.")
+        
+        if not api_key:
+            st.warning("⚠️ Configura tu API Key de Groq en `.streamlit/secrets.toml`")
+        else:
+            with st.container():
+                c1, c2 = st.columns(2)
+                days = c1.slider("Días disponibles/semana", 2, 6, 4)
+                goal = c2.selectbox("Objetivo Principal", ["Mejorar ritmo", "Aumentar distancia", "Preparar carrera", "Salud/Mantenimiento"])
+                
+                if st.button("🚀 Generar Plan Personalizado", type="primary", use_container_width=True):
+                    with st.spinner("Analizando historial y generando plan..."):
+                        try:
+                            from utils.ai_analyzer import AIRunningAnalyzer
+                            analyzer = AIRunningAnalyzer(api_key)
+                            # Use the full context generator for the plan
+                            context = analyzer.prepare_context(st.session_state.runs, st.session_state.runs_df, {'running_days': days, 'main_goal': goal})
+                            analysis = analyzer.generate_analysis(context)
+                            st.session_state['ai_full_plan'] = analysis
+                        except Exception as e:
+                            st.error(f"Error: {e}")
+
+            if 'ai_full_plan' in st.session_state:
+                st.markdown("---")
+                st.markdown(st.session_state['ai_full_plan'])
 
 
 def render_data_manager():
