@@ -303,15 +303,20 @@ RESUMEN SEMANAL:
 - Tipos de sesión: {weekly_stats.get('session_types', {})}
 """
         if user_context:
-            context += f"\nCONTEXTO DEL USUARIO (IMPORTANTE): {user_context}\n"
+            context += f"\nCONTEXTO DEL USUARIO (MUY IMPORTANTE - PRIORIDAD MÁXIMA): {user_context}\n"
 
         prompt = f"""Analiza esta semana de entrenamiento de un corredor:
 {context}
 
+INSTRUCCIONES CRÍTICAS:
+1. **PRIORIZA EL CONTEXTO DEL USUARIO**: Si el usuario explica por qué el volumen es bajo (ej: vacaciones, enfermedad, semana incompleta), NO lo critiques negativamente. Úsalo para EXPLICAR los datos.
+2. **Mira al Futuro**: Si el usuario dice que hará más sesiones esta semana, tenlo en cuenta en tu evaluación.
+3. **Sé Empático**: Si hubo un parón justificado, da ánimos para retomar, no regañes.
+
 Como entrenador, dame un feedback CORTO y DIRECTO (máx 150 palabras) con:
-1. **Evaluación**: ¿Ha sido una semana de carga, descarga o mantenimiento? ¿El volumen es adecuado?
-2. **Consejo Inmediato**: ¿Qué debería hacer la próxima semana basándose en esto? (Ej: descansar más, mantener, apretar...)
-3. **Alerta**: Si ves algo preocupante (mucha carga de golpe, falta de variedad, etc).
+1. **Evaluación**: ¿Ha sido una semana de carga, descarga o mantenimiento? (Considera el contexto).
+2. **Consejo Inmediato**: ¿Qué debería hacer la próxima semana?
+3. **Alerta**: Solo si hay algo realmente preocupante que NO esté explicado por el contexto.
 
 Usa emojis y formato markdown.
 """
@@ -328,14 +333,18 @@ PROGRESIÓN MENSUAL:
 - Tendencia Volumen: {progression.get('volume_trend', 'stable')}
 """
         if user_context:
-            context += f"\nCONTEXTO DEL USUARIO (IMPORTANTE): {user_context}\n"
+            context += f"\nCONTEXTO DEL USUARIO (MUY IMPORTANTE - PRIORIDAD MÁXIMA): {user_context}\n"
 
         prompt = f"""Analiza la progresión del último mes de este corredor:
 {context}
 
+INSTRUCCIONES CRÍTICAS:
+1. **CONTEXTO PRIMERO**: Si la tendencia es negativa pero el usuario da una razón válida (lesión, trabajo, vacaciones), acéptala y adapta el consejo.
+2. **No seas robótico**: Entiende la vida real del corredor amateur.
+
 Como entrenador, dame un análisis de TENDENCIAS (máx 200 palabras):
-1. **¿Estamos mejorando?**: Interpreta los cambios en eficiencia y ritmo.
-2. **Enfoque del Mes**: ¿En qué fase del entrenamiento parece estar? (Base, Calidad, Tapering...)
+1. **¿Estamos mejorando?**: Interpreta los cambios en eficiencia y ritmo (considerando el contexto).
+2. **Enfoque del Mes**: ¿En qué fase del entrenamiento parece estar?
 3. **Recomendación Táctica**: ¿Qué cualidad física debería priorizar el próximo mes?
 
 Usa emojis y formato markdown.
@@ -354,14 +363,18 @@ HISTORIAL A LARGO PLAZO:
 - Mes más activo: {annual_stats.get('most_active_month', 'N/A')}
 """
         if user_context:
-            context += f"\nCONTEXTO DEL USUARIO (IMPORTANTE): {user_context}\n"
+            context += f"\nCONTEXTO DEL USUARIO (MUY IMPORTANTE - PRIORIDAD MÁXIMA): {user_context}\n"
 
         prompt = f"""Analiza la constancia y visión a largo plazo:
 {context}
 
+INSTRUCCIONES CRÍTICAS:
+1. **CONTEXTO**: Si hay huecos en el historial explicados por el usuario, no los penalices en la valoración de constancia.
+2. **Motivación**: Céntrate en lo positivo y en el futuro.
+
 Como entrenador, valora la CONSISTENCIA (máx 150 palabras):
-1. **Valoración de Constancia**: ¿Es un corredor consistente?
-2. **Visión Macro**: ¿Cómo ves su evolución de volumen a largo plazo?
+1. **Valoración de Constancia**: ¿Es un corredor consistente? (Matiza con el contexto).
+2. **Visión Macro**: ¿Cómo ves su evolución?
 3. **Palabras de Motivación**: Mensaje para mantener la disciplina.
 
 Usa emojis y formato markdown.
